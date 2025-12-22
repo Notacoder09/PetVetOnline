@@ -548,7 +548,7 @@ const PetVetBridgePage = () => {
 
           {/* Other testimonials */}
           <div className="grid gap-6 md:grid-cols-3">
-            {regularTestimonials.map((t, index) => (
+            {regularTestimonials.map((t) => (
               <div
                 key={t.name}
                 className="bg-white/95 rounded-2xl border border-slate-100 p-5 shadow-sm hover:shadow-md hover:-translate-y-1 transition-transform flex flex-col gap-3"
