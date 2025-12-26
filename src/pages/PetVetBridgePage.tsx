@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AFFILIATE_URL = "https://afflat3c2.com/trk/lnk/C0D1E8E4-CA5B-4BE0-8D1E-274667C72991/?o=21098&c=918271&a=779726&k=D930AC5A038E7A43BE4A632737DD63BE&l=22029";
+const AFFILIATE_URL = "https://afflat3c1.com/trk/lnk/C0D1E8E4-CA5B-4BE0-8D1E-274667C72991/?o=21094&c=918271&a=779726&k=6BDB2C5AE0354C49F6BEA312EA3FB005&l=22023";
 const BRAND_NAME = "PetHelpLine";
 const MAIN_OFFER_NAME = "Instant Vet Chat for Worried Pet Parents";
 
