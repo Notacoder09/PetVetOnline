@@ -1,8 +1,94 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const AFFILIATE_URL = "https://afflat3e3.com/trk/lnk/C0D1E8E4-CA5B-4BE0-8D1E-274667C72991/?o=21094&c=918277&a=779726&k=6BDB2C5AE0354C49F6BEA312EA3FB005&l=22023";
 const BRAND_NAME = "PetHelpLine";
 const MAIN_OFFER_NAME = "Instant Vet Chat for Worried Pet Parents";
+
+type PetType = "dog" | "cat";
+
+// Copy constants for dog and cat
+const COPY = {
+  dog: {
+    heroHeadline: "Worried something is off with your dog?",
+    heroSubhead: "Talk to a licensed vet online in minutes — before you spend hundreds at the ER or lose sleep guessing.",
+    warningText: "If your dog's symptoms worsen quickly, getting guidance now can help you decide what to do.",
+    ctaText: "Describe Your Dog's Symptoms",
+    symptomsTitle: "What's Going On With Your Dog?",
+    symptomsSubtext: "Tap the closest option — you'll be able to explain everything in your own words once you're inside the vet chat.",
+    symptomsHelpText: "Choosing your dog's main symptom helps the vet determine urgency faster.",
+    finalCtaHeadline: "Don't Wait. Get a Vet's Guidance Before Symptoms Worsen.",
+    finalCtaSubhead: "Early advice can prevent unnecessary panic — or help you avoid a dangerous delay.",
+    finalCtaMicrocopy: "Answer a few quick questions to be matched with the right veterinarian for your dog's situation.",
+    stickyCtaText: "Worried about your dog?",
+    stickyCtaMicrocopy: "Instant help available · Don't wait and worry",
+    comparisonTraditional: [
+      "Emergency visit fees often start at $300–$500 before any tests or treatment.",
+      "Late‑night drives across town with a scared, possibly nauseous dog in the back seat.",
+      "Crowded waiting rooms, long lines, and no clear idea how long you'll be there.",
+      "You're panicking, your dog is miserable, and you still don't know if it's truly life‑threatening.",
+      "Symptoms can escalate while you're unsure what to do.",
+    ],
+    comparisonOnline: [
+      "Licensed vets respond in minutes, 24/7 — even at 2 AM.",
+      "A vet helps you decide if it's ER‑urgent or safe to monitor at home.",
+      "May save you an unnecessary $500+ emergency visit.",
+      "Your dog stays where they feel safest: at home, with you, while you get answers.",
+      "Immediate guidance so you're not guessing during critical moments.",
+    ],
+    chatMessage: "Hi, I'm Dr. Sarah. Tell me what's going on with your dog.",
+    finalCtaBadge: "Clear next steps for your dog",
+  },
+  cat: {
+    heroHeadline: "Is your cat not eating, hiding, or acting 'off'?",
+    heroSubhead: "Cats hide pain. Talk to a licensed vet online in minutes — before panic (or an expensive ER visit).",
+    warningText: "If your cat's symptoms worsen quickly, getting guidance now can help you decide what to do.",
+    ctaText: "Describe Your Cat's Symptoms",
+    symptomsTitle: "What's Going On With Your Cat?",
+    symptomsSubtext: "Tap the closest option — you'll be able to explain everything in your own words once you're inside the vet chat.",
+    symptomsHelpText: "Choosing your cat's main symptom helps the vet determine urgency faster.",
+    finalCtaHeadline: "Don't Wait. Get a Vet's Guidance Before Symptoms Worsen.",
+    finalCtaSubhead: "Early advice can prevent unnecessary panic — or help you avoid a dangerous delay.",
+    finalCtaMicrocopy: "Answer a few quick questions to be matched with the right veterinarian for your cat's situation.",
+    stickyCtaText: "Worried about your cat?",
+    stickyCtaMicrocopy: "Instant help available · Don't wait and worry",
+    comparisonTraditional: [
+      "Emergency visit fees often start at $300–$500 before any tests or treatment.",
+      "Late‑night drives across town with a scared, possibly nauseous cat in the carrier.",
+      "Crowded waiting rooms, long lines, and no clear idea how long you'll be there.",
+      "You're panicking, your cat is miserable, and you still don't know if it's truly life‑threatening.",
+      "Symptoms can escalate while you're unsure what to do.",
+    ],
+    comparisonOnline: [
+      "Licensed vets respond in minutes, 24/7 — even at 2 AM.",
+      "A vet helps you decide if it's ER‑urgent or safe to monitor at home.",
+      "May save you an unnecessary $500+ emergency visit.",
+      "Your cat stays where they feel safest: at home, with you, while you get answers.",
+      "Immediate guidance so you're not guessing during critical moments.",
+    ],
+    chatMessage: "Hi, I'm Dr. Sarah. Tell me what's going on with your cat.",
+    finalCtaBadge: "Clear next steps for your cat",
+  },
+};
+
+// Symptom options for each pet type
+const SYMPTOM_OPTIONS = {
+  dog: [
+    { label: "Vomiting / nausea", icon: "🤢", value: "vomiting" },
+    { label: "Ate chocolate or toxin", icon: "🍫", value: "toxin" },
+    { label: "Diarrhea / blood in stool", icon: "❤️‍🩹", value: "diarrhea" },
+    { label: "Won't eat or drink", icon: "⚠️", value: "not-eating" },
+    { label: "Limping / pain / injury", icon: "💉", value: "injury" },
+    { label: "Something just feels off", icon: "🐶", value: "general" },
+  ],
+  cat: [
+    { label: "Not eating / not drinking", icon: "🍽️", value: "not-eating" },
+    { label: "Hiding more than usual", icon: "🙈", value: "hiding" },
+    { label: "Vomiting / hairballs / nausea", icon: "🤢", value: "vomiting" },
+    { label: "Litter box changes (not going / straining)", icon: "🚽", value: "litter-box" },
+    { label: "Lethargic / low energy", icon: "😴", value: "lethargic" },
+    { label: "Something just feels off", icon: "🐱", value: "general" },
+  ],
+};
 
 const steps = [
   {
@@ -22,23 +108,6 @@ const steps = [
   },
 ];
 
-const comparison = {
-  traditional: [
-    "Emergency visit fees often start at $300–$500 before any tests or treatment.",
-    "Late‑night drives across town with a scared, possibly nauseous dog in the back seat.",
-    "Crowded waiting rooms, long lines, and no clear idea how long you'll be there.",
-    "You're panicking, your dog is miserable, and you still don't know if it's truly life‑threatening.",
-    "Symptoms can escalate while you're unsure what to do.",
-  ],
-  online: [
-    "Licensed vets respond in minutes, 24/7 — even at 2 AM.",
-    "A vet helps you decide if it's ER‑urgent or safe to monitor at home.",
-    "May save you an unnecessary $500+ emergency visit.",
-    "Your dog stays where they feel safest: at home, with you, while you get answers.",
-    "Immediate guidance so you're not guessing during critical moments.",
-  ],
-};
-
 const trustBadges = [
   "Verified Veterinarians",
   "24/7 Immediate Access",
@@ -48,58 +117,113 @@ const trustBadges = [
   "Typical reply < 2 minutes",
 ];
 
-const testimonials = [
-  {
-    name: "Amanda R.",
-    dog: "Bella, 3-year-old Beagle",
-    caseType: "Ate something possibly toxic",
-    story:
-      "Bella suddenly started vomiting and wouldn't settle. I was ready to bolt to the ER. The online vet walked me through questions and helped me realize it could wait until morning. It saved us money and a ton of panic.",
-    featured: true,
-    avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face&auto=format",
-    urgencyTag: "Avoided unnecessary ER trip",
-  },
-  {
-    name: "James T.",
-    dog: "Rocky, 1-year-old Lab mix",
-    caseType: "Swallowed part of a toy",
-    story:
-      "Rocky swallowed part of a toy and I was freaking out. I sent a photo and the vet explained exactly what to watch for and when to go in. Having clear guidance in minutes was priceless.",
-    featured: false,
-    avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face&auto=format",
-    urgencyTag: "Resolved early",
-  },
-  {
-    name: "Danielle P.",
-    dog: "Luna, 6-year-old Husky",
-    caseType: "Acting strange & whining",
-    story:
-      "Luna was acting off and whining, but I didn't know if it was serious. The vet chat helped me rule out a few scary things and gave me a step‑by‑step plan. I finally felt like I wasn't guessing alone.",
-    featured: false,
-    avatarUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face&auto=format",
-    urgencyTag: "Identified urgency quickly",
-  },
-  {
-    name: "Sara L.",
-    dog: "Milo, 4-year-old Golden Retriever",
-    caseType: "Vomiting foam with specks of blood",
-    story:
-      "Milo started vomiting foam with a little blood and my heart dropped. Within minutes, the vet explained what might be happening, what to watch closely, and the exact moment we should head to the ER if things changed. That calm, clear plan turned a meltdown into something we could handle.",
-    featured: false,
-    avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face&auto=format",
-    urgencyTag: "Resolved early",
-  },
-  {
-    name: "Michael C.",
-    dog: "Max, 5-year-old German Shepherd",
-    caseType: "Rapid breathing & lethargy",
-    story:
-      "Max was getting worse by the hour — breathing faster, not moving much. I didn't know if it was an emergency or if I was overreacting. The online vet asked specific questions and immediately told me to go to the ER right away. Turned out he had a serious issue that needed immediate care. The vet's quick assessment probably saved his life.",
-    featured: false,
-    avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format",
-    urgencyTag: "Identified urgency quickly",
-  },
-];
+// Testimonials with pet type
+const testimonials = {
+  dog: [
+    {
+      name: "Amanda R.",
+      pet: "Bella, 3-year-old Beagle",
+      caseType: "Ate something possibly toxic",
+      story:
+        "Bella suddenly started vomiting and wouldn't settle. I was ready to bolt to the ER. The online vet walked me through questions and helped me realize it could wait until morning. It saved us money and a ton of panic.",
+      featured: true,
+      avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face&auto=format",
+      urgencyTag: "Avoided unnecessary ER trip",
+    },
+    {
+      name: "James T.",
+      pet: "Rocky, 1-year-old Lab mix",
+      caseType: "Swallowed part of a toy",
+      story:
+        "Rocky swallowed part of a toy and I was freaking out. I sent a photo and the vet explained exactly what to watch for and when to go in. Having clear guidance in minutes was priceless.",
+      featured: false,
+      avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face&auto=format",
+      urgencyTag: "Resolved early",
+    },
+    {
+      name: "Danielle P.",
+      pet: "Luna, 6-year-old Husky",
+      caseType: "Acting strange & whining",
+      story:
+        "Luna was acting off and whining, but I didn't know if it was serious. The vet chat helped me rule out a few scary things and gave me a step‑by‑step plan. I finally felt like I wasn't guessing alone.",
+      featured: false,
+      avatarUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face&auto=format",
+      urgencyTag: "Identified urgency quickly",
+    },
+    {
+      name: "Sara L.",
+      pet: "Milo, 4-year-old Golden Retriever",
+      caseType: "Vomiting foam with specks of blood",
+      story:
+        "Milo started vomiting foam with a little blood and my heart dropped. Within minutes, the vet explained what might be happening, what to watch closely, and the exact moment we should head to the ER if things changed. That calm, clear plan turned a meltdown into something we could handle.",
+      featured: false,
+      avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face&auto=format",
+      urgencyTag: "Resolved early",
+    },
+    {
+      name: "Michael C.",
+      pet: "Max, 5-year-old German Shepherd",
+      caseType: "Rapid breathing & lethargy",
+      story:
+        "Max was getting worse by the hour — breathing faster, not moving much. I didn't know if it was an emergency or if I was overreacting. The online vet asked specific questions and immediately told me to go to the ER right away. Turned out he had a serious issue that needed immediate care. The vet's quick assessment probably saved his life.",
+      featured: false,
+      avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format",
+      urgencyTag: "Identified urgency quickly",
+    },
+  ],
+  cat: [
+    {
+      name: "Emma K.",
+      pet: "Whiskers, 5-year-old Tabby",
+      caseType: "Not eating for 2 days",
+      story:
+        "Whiskers stopped eating and was hiding under the bed. I was terrified something was seriously wrong. The online vet asked about her behavior and helped me understand it might be stress-related, but also gave me clear signs to watch for that would mean an emergency. Having that guidance saved me from a panic trip to the ER.",
+      featured: true,
+      avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face&auto=format",
+      urgencyTag: "Avoided unnecessary ER trip",
+    },
+    {
+      name: "David M.",
+      pet: "Luna, 3-year-old Siamese",
+      caseType: "Litter box issues & hiding",
+      story:
+        "Luna was straining in the litter box and hiding more than usual. I didn't know if it was a UTI or something worse. The vet chat helped me understand the urgency and what to do immediately. They guided me through what to watch for and when to seek emergency care. That clarity was exactly what I needed.",
+      featured: false,
+      avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face&auto=format",
+      urgencyTag: "Resolved early",
+    },
+    {
+      name: "Rachel S.",
+      pet: "Mittens, 7-year-old Persian",
+      caseType: "Vomiting frequently",
+      story:
+        "Mittens was vomiting multiple times a day and I was worried about dehydration. The online vet helped me understand when vomiting becomes an emergency and what I could do at home. They gave me a clear plan and told me exactly when to go to the ER. That guidance was invaluable.",
+      featured: false,
+      avatarUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face&auto=format",
+      urgencyTag: "Identified urgency quickly",
+    },
+    {
+      name: "Chris T.",
+      pet: "Shadow, 4-year-old Maine Coon",
+      caseType: "Lethargic and not drinking",
+      story:
+        "Shadow was suddenly very lethargic and not drinking water. I was panicking because cats can get dehydrated quickly. The vet chat helped me assess the situation and gave me clear next steps. They helped me decide it was time for an ER visit, and I'm so glad I listened. The vet's quick assessment was spot on.",
+      featured: false,
+      avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face&auto=format",
+      urgencyTag: "Resolved early",
+    },
+    {
+      name: "Jessica L.",
+      pet: "Oreo, 2-year-old Tuxedo",
+      caseType: "Acting strange, hiding",
+      story:
+        "Oreo was hiding and acting completely different than normal. I didn't know if it was behavioral or medical. The online vet asked the right questions and helped me understand it could be a medical issue. They guided me on what to watch for and when to seek care. That early intervention made all the difference.",
+      featured: false,
+      avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format",
+      urgencyTag: "Identified urgency quickly",
+    },
+  ],
+};
 
 const faqs = [
   {
@@ -130,18 +254,101 @@ const faqs = [
   {
     question: "Will the vet tell me if I should go to the ER?",
     answer:
-      "Yes. One of the most valuable parts of this service is helping you decide if it's an emergency. If the vet thinks your dog needs hands‑on care, they'll tell you clearly and urgently.",
+      "Yes. One of the most valuable parts of this service is helping you decide if it's an emergency. If the vet thinks your pet needs hands‑on care, they'll tell you clearly and urgently.",
   },
   {
-    question: "What if I'm not sure how urgent my dog's symptoms are?",
+    question: "What if I'm not sure how urgent my pet's symptoms are?",
     answer:
       "That's exactly what the vet helps with. They guide you through what to watch for and whether you should seek emergency care immediately or monitor at home.",
   },
 ];
 
+// Pet Selector Component
+const PetSelector = ({ petType, onSelect }: { petType: PetType; onSelect: (type: PetType) => void }) => {
+  return (
+    <div className="flex items-center justify-center gap-2 mb-6">
+      <button
+        onClick={() => onSelect("dog")}
+        className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 ${
+          petType === "dog"
+            ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/40"
+            : "bg-white/90 text-slate-700 border border-emerald-100 hover:bg-emerald-50"
+        }`}
+        aria-pressed={petType === "dog"}
+      >
+        🐶 Dog
+      </button>
+      <button
+        onClick={() => onSelect("cat")}
+        className={`px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 ${
+          petType === "cat"
+            ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/40"
+            : "bg-white/90 text-slate-700 border border-emerald-100 hover:bg-emerald-50"
+        }`}
+        aria-pressed={petType === "cat"}
+      >
+        🐱 Cat
+      </button>
+    </div>
+  );
+};
+
+// Symptom Grid Component
+const SymptomGrid = ({ 
+  symptoms, 
+  onSymptomClick 
+}: { 
+  symptoms: typeof SYMPTOM_OPTIONS.dog; 
+  onSymptomClick: (symptom: string) => void;
+}) => {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+      {symptoms.map((symptom) => (
+        <button
+          key={symptom.value}
+          onClick={() => onSymptomClick(symptom.value)}
+          className="group flex flex-col items-center justify-center gap-1 text-xs sm:text-sm px-3 sm:px-4 py-2.5 rounded-2xl border border-emerald-100/70 bg-white/90 hover:bg-emerald-50 text-slate-800 font-medium shadow-sm hover:shadow-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+        >
+          <span className="text-lg sm:text-xl">{symptom.icon}</span>
+          <span className="text-[11px] sm:text-xs text-center leading-snug">{symptom.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+};
+
 const PetVetBridgePage = () => {
-  const handlePrimaryClick = () => {
-    window.location.href = AFFILIATE_URL;
+  // Get pet type from URL param, default to "dog"
+  const [petType, setPetType] = useState<PetType>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const pet = params.get('pet');
+      if (pet === 'cat' || pet === 'dog') {
+        return pet as PetType;
+      }
+    }
+    return 'dog';
+  });
+
+  // Update URL param when pet type changes (without page reload)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('pet', petType);
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [petType]);
+
+  const handlePrimaryClick = (symptom?: string) => {
+    let url = AFFILIATE_URL;
+    if (symptom) {
+      const separator = url.includes('?') ? '&' : '?';
+      url = `${url}${separator}pet=${petType}&symptom=${symptom}`;
+    } else {
+      const separator = url.includes('?') ? '&' : '?';
+      url = `${url}${separator}pet=${petType}`;
+    }
+    window.location.href = url;
   };
 
   const handleScroll = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -152,17 +359,15 @@ const PetVetBridgePage = () => {
     }
   };
 
-  const featuredTestimonial = testimonials.find((t) => t.featured);
-  const regularTestimonials = testimonials.filter((t) => !t.featured);
-
-  const symptomOptions = [
-    { label: "Vomiting or nausea", icon: "🤢" },
-    { label: "Ate chocolate or toxin", icon: "🍫" },
-    { label: "Diarrhea or blood in stool", icon: "❤️‍🩹" },
-    { label: "Won't eat or drink", icon: "⚠️" },
-    { label: "Limping, pain, or injury", icon: "💉" },
-    { label: "Something just feels off", icon: "🐶" },
-  ];
+  const currentCopy = COPY[petType];
+  const currentSymptoms = SYMPTOM_OPTIONS[petType];
+  const currentTestimonials = testimonials[petType];
+  const featuredTestimonial = currentTestimonials.find((t) => t.featured);
+  const regularTestimonials = currentTestimonials.filter((t) => !t.featured);
+  const currentComparison = {
+    traditional: currentCopy.comparisonTraditional,
+    online: currentCopy.comparisonOnline,
+  };
 
   return (
     <div className="bg-gradient-to-b from-emerald-50 via-slate-50 to-emerald-100 text-slate-900 min-h-screen flex flex-col pb-28 md:pb-16">
@@ -190,15 +395,23 @@ const PetVetBridgePage = () => {
                   {BRAND_NAME} · {MAIN_OFFER_NAME}
                 </span>
               </p>
+              
+              {/* Pet Selector */}
+              <PetSelector petType={petType} onSelect={setPetType} />
+
+              {/* JustAnswer Credibility */}
+              <p className="text-xs text-slate-600">
+                Powered by JustAnswer • Verified licensed veterinarians
+              </p>
+
               <h1 className="text-3xl sm:text-[2.4rem] lg:text-[2.8rem] font-bold leading-tight text-slate-900 tracking-tight">
-                Is Your Dog Vomiting, Acting Strange, or Just &quot;Not Right&quot;?
+                {currentCopy.heroHeadline}
               </h1>
               <p className="text-base sm:text-lg text-slate-700/90 max-w-xl">
-                Talk to a licensed vet online in minutes — before you spend hundreds at the emergency clinic or lose sleep
-                wondering if you&apos;re missing something serious.
+                {currentCopy.heroSubhead}
               </p>
               <p className="text-sm text-amber-700/80 bg-amber-50/60 border border-amber-100 rounded-lg px-3 py-2 max-w-xl">
-                If your dog&apos;s symptoms worsen quickly, getting guidance now can help you decide what to do.
+                {currentCopy.warningText}
               </p>
 
               <ul className="space-y-3 text-sm sm:text-base">
@@ -218,11 +431,11 @@ const PetVetBridgePage = () => {
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full">
                 <button
-                  onClick={handlePrimaryClick}
+                  onClick={() => handlePrimaryClick()}
                   className="group w-full sm:w-auto px-6 sm:px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold text-base sm:text-lg shadow-lg shadow-emerald-500/40 transition-all duration-200 hover:-translate-y-0.5"
                 >
                   <span className="inline-flex items-center justify-center gap-2">
-                    Describe Your Dog&apos;s Symptoms
+                    {currentCopy.ctaText}
                     <span className="transition-transform duration-200 group-hover:translate-x-0.5">
                       →
                     </span>
@@ -236,6 +449,12 @@ const PetVetBridgePage = () => {
                   <span aria-hidden="true">↓</span>
                 </button>
               </div>
+
+              {/* Pricing Clarity */}
+              <p className="text-xs text-slate-600 max-w-xl">
+                You'll start with a low intro fee to open the chat. Review the pricing on the next page and cancel anytime.
+              </p>
+
               <div className="flex flex-col gap-2">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-200 text-emerald-700 text-xs font-medium w-fit">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -245,7 +464,7 @@ const PetVetBridgePage = () => {
                   Licensed vets respond within minutes — availability can vary during peak hours.
                 </p>
                 <p className="text-xs text-slate-500">
-                  You&apos;ll answer a few quick questions, then be connected with a licensed veterinarian in a secure,
+                  You'll answer a few quick questions, then be connected with a licensed veterinarian in a secure,
                   private chat.
                 </p>
               </div>
@@ -285,20 +504,22 @@ const PetVetBridgePage = () => {
 
                 <div className="space-y-3 text-xs sm:text-sm">
                   <div className="max-w-[88%] rounded-2xl rounded-bl-sm bg-emerald-50 text-slate-800 px-3 py-2 shadow-sm shadow-emerald-100">
-                    <p>Hi, I&apos;m Dr. Sarah. Tell me what&apos;s going on with your dog.</p>
+                    <p>{currentCopy.chatMessage}</p>
                     <p className="mt-1 text-[10px] text-slate-400">10:41 PM</p>
                   </div>
                   <div className="flex justify-end">
                     <div className="max-w-[88%] rounded-2xl rounded-br-sm bg-slate-900 text-white px-3 py-2 shadow-sm shadow-slate-900/40">
                       <p>
-                        He&apos;s been vomiting and I saw a little blood. I&apos;m scared it might be something serious.
+                        {petType === "dog" 
+                          ? "He's been vomiting and I saw a little blood. I'm scared it might be something serious."
+                          : "She's been hiding and not eating. I'm worried something is wrong."}
                       </p>
                       <p className="mt-1 text-[10px] text-slate-300 text-right">10:42 PM</p>
                     </div>
                   </div>
                   <div className="max-w-[86%] rounded-2xl rounded-bl-sm bg-emerald-50 text-slate-800 px-3 py-2 shadow-sm shadow-emerald-100/80">
                     <p>
-                      Thank you for sharing that. I&apos;ll ask a few quick questions so we can decide together if this is an
+                      Thank you for sharing that. I'll ask a few quick questions so we can decide together if this is an
                       emergency or if you can monitor at home.
                     </p>
                     <p className="mt-1 text-[10px] text-slate-400">10:43 PM</p>
@@ -325,31 +546,18 @@ const PetVetBridgePage = () => {
         <section className="space-y-4">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-slate-900">
-              What&apos;s Going On With Your Dog?
+              {currentCopy.symptomsTitle}
             </h2>
             <p className="text-sm sm:text-base text-slate-600 mt-1 max-w-xl mx-auto">
-              Tap the closest option — you&apos;ll be able to explain everything in your own words once you&apos;re inside the
-              vet chat.
+              {currentCopy.symptomsSubtext}
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-            {symptomOptions.map((symptom) => (
-              <button
-                key={symptom.label}
-                onClick={handlePrimaryClick}
-                className="group flex flex-col items-center justify-center gap-1 text-xs sm:text-sm px-3 sm:px-4 py-2.5 rounded-2xl border border-emerald-100/70 bg-white/90 hover:bg-emerald-50 text-slate-800 font-medium shadow-sm hover:shadow-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
-              >
-                <span className="text-lg sm:text-xl">
-                  {symptom.icon}
-                </span>
-                <span className="text-[11px] sm:text-xs text-center leading-snug">
-                  {symptom.label}
-                </span>
-              </button>
-            ))}
-          </div>
+          <SymptomGrid 
+            symptoms={currentSymptoms} 
+            onSymptomClick={(symptom) => handlePrimaryClick(symptom)}
+          />
           <p className="text-[11px] sm:text-xs text-slate-500 text-center">
-            Choosing your dog&apos;s main symptom helps the vet determine urgency faster.
+            {currentCopy.symptomsHelpText}
           </p>
         </section>
 
@@ -390,7 +598,7 @@ const PetVetBridgePage = () => {
               How the Online Vet Chat Works (About 2 Minutes)
             </h2>
             <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
-              It&apos;s the same kind of calm, structured conversation you&apos;d have in an exam room — just from your phone.
+              It's the same kind of calm, structured conversation you'd have in an exam room — just from your phone.
             </p>
           </div>
 
@@ -433,7 +641,7 @@ const PetVetBridgePage = () => {
               Before You Rush to the ER, Talk to an Online Vet First
             </h2>
             <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto">
-              Emergency vets are life‑saving — but they&apos;re also expensive, overwhelming, and not always necessary. A
+              Emergency vets are life‑saving — but they're also expensive, overwhelming, and not always necessary. A
               quick online chat can help you decide the right move.
             </p>
           </div>
@@ -444,7 +652,7 @@ const PetVetBridgePage = () => {
                 <span>Emergency vet stress</span>
               </h3>
               <ul className="space-y-3 text-sm text-slate-700">
-                {comparison.traditional.map((item) => (
+                {currentComparison.traditional.map((item) => (
                   <li key={item} className="flex gap-3">
                     <span className="mt-1 text-rose-500 text-base">❌</span>
                     <span>{item}</span>
@@ -458,7 +666,7 @@ const PetVetBridgePage = () => {
                 <span>Online vet clarity</span>
               </h3>
               <ul className="space-y-3 text-sm text-slate-700">
-                {comparison.online.map((item) => (
+                {currentComparison.online.map((item) => (
                   <li key={item} className="flex gap-3">
                     <span className="mt-1 text-emerald-500 text-base">✔️</span>
                     <span>{item}</span>
@@ -496,7 +704,7 @@ const PetVetBridgePage = () => {
               Real Pet Parents, Real Peace of Mind
             </h2>
             <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
-              These are the moments when you don&apos;t want to guess alone. Here&apos;s what other pet parents experienced.
+              These are the moments when you don't want to guess alone. Here's what other pet parents experienced.
             </p>
           </div>
 
@@ -515,7 +723,7 @@ const PetVetBridgePage = () => {
                   <p className="text-sm font-semibold text-slate-900">
                     {featuredTestimonial.name}
                   </p>
-                  <p className="text-xs text-slate-500">{featuredTestimonial.dog}</p>
+                  <p className="text-xs text-slate-500">{featuredTestimonial.pet}</p>
                   <div className="flex flex-wrap gap-2 mt-1">
                     <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-800">
                       <span>✅</span>
@@ -563,7 +771,7 @@ const PetVetBridgePage = () => {
                     <p className="text-sm font-semibold text-slate-900">
                       {t.name}
                     </p>
-                    <p className="text-xs text-slate-500">{t.dog}</p>
+                    <p className="text-xs text-slate-500">{t.pet}</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -597,7 +805,7 @@ const PetVetBridgePage = () => {
         {/* VET HIGHLIGHT STRIP */}
         <section className="space-y-5">
           <p className="text-center text-sm sm:text-base font-medium text-slate-800">
-            The vets you&apos;ll meet are real people with years of experience helping worried pet parents.
+            The vets you'll meet are real people with years of experience helping worried pet parents.
           </p>
           <div className="grid gap-4 sm:grid-cols-3">
             {[
@@ -677,10 +885,10 @@ const PetVetBridgePage = () => {
         {/* FINAL CTA */}
         <section className="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 px-5 py-7 sm:px-8 sm:py-9 text-center text-white shadow-xl shadow-emerald-500/50">
           <h2 className="text-2xl sm:text-[1.7rem] font-bold tracking-tight">
-            Don&apos;t Wait. Get a Vet&apos;s Guidance Before Symptoms Worsen.
+            {currentCopy.finalCtaHeadline}
           </h2>
           <p className="mt-3 text-sm sm:text-base text-emerald-50 max-w-2xl mx-auto leading-relaxed">
-            Early advice can prevent unnecessary panic — or help you avoid a dangerous delay.
+            {currentCopy.finalCtaSubhead}
           </p>
 
           <div className="mt-5 flex flex-col items-center gap-3">
@@ -694,14 +902,14 @@ const PetVetBridgePage = () => {
                 <span>Private &amp; secure</span>
               </span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-800/40 border border-emerald-300/40">
-                <span>🐶</span>
-                <span>Clear next steps for your dog</span>
+                <span>{petType === "dog" ? "🐶" : "🐱"}</span>
+                <span>{currentCopy.finalCtaBadge}</span>
               </span>
             </div>
 
             <div className="w-full sm:w-auto max-w-md mx-auto mt-2">
               <button
-                onClick={handlePrimaryClick}
+                onClick={() => handlePrimaryClick()}
                 className="group w-full bg-white text-emerald-800 font-semibold text-base sm:text-lg py-4 rounded-xl shadow-lg shadow-emerald-900/30 hover:bg-emerald-50 transition-all duration-200 hover:-translate-y-0.5"
               >
                 <span className="inline-flex items-center justify-center gap-2">
@@ -715,7 +923,7 @@ const PetVetBridgePage = () => {
                 Licensed vet available right now · Replies in minutes
               </p>
               <p className="mt-1 text-[11px] sm:text-xs text-emerald-200/80">
-                Answer a few quick questions to be matched with the right veterinarian for your dog&apos;s situation.
+                {currentCopy.finalCtaMicrocopy}
               </p>
             </div>
           </div>
@@ -723,19 +931,19 @@ const PetVetBridgePage = () => {
       </div>
 
       {/* STICKY MOBILE CTA */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur border-t border-slate-200 shadow-2xl shadow-slate-900/15 p-3 flex items-center justify-between gap-3">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur border-t border-slate-200 shadow-2xl shadow-slate-900/15 p-3 flex items-center justify-between gap-3 z-50">
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
-            <span className="text-lg">🐶</span>
-            <span>Worried about your dog?</span>
+            <span className="text-lg">{petType === "dog" ? "🐶" : "🐱"}</span>
+            <span>{currentCopy.stickyCtaText}</span>
           </div>
           <p className="text-[11px] text-slate-500">
-            Instant help available · Don&apos;t wait and worry
+            {currentCopy.stickyCtaMicrocopy}
           </p>
         </div>
         <button
-          onClick={handlePrimaryClick}
-          className="group bg-emerald-500 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-md shadow-emerald-400/40 flex items-center gap-1.5 animate-pulse"
+          onClick={() => handlePrimaryClick()}
+          className="group bg-emerald-500 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-md shadow-emerald-400/40 flex items-center gap-1.5"
         >
           <span>Chat with a Vet</span>
           <span className="transition-transform duration-200 group-hover:translate-x-0.5">
@@ -748,4 +956,3 @@ const PetVetBridgePage = () => {
 };
 
 export default PetVetBridgePage;
-
