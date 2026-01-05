@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const AFFILIATE_URL = "https://afflat3e3.com/trk/lnk/C0D1E8E4-CA5B-4BE0-8D1E-274667C72991/?o=21094&c=918277&a=779726&k=6BDB2C5AE0354C49F6BEA312EA3FB005&l=22023";
 const BRAND_NAME = "PetHelpLine";
